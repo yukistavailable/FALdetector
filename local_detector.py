@@ -34,8 +34,10 @@ if __name__ == '__main__':
 
     # Loading the model
     if torch.cuda.is_available():
+        print(f'cuda:{gpu_id} is available')
         device = 'cuda:{}'.format(gpu_id)
     else:
+        print(f'cuda is not available')
         device = 'cpu'
 
     model = DRNSeg(2)
@@ -70,12 +72,20 @@ if __name__ == '__main__':
         h, w, _ = flow.shape
 
     # Undoing the warps
+    print(f"w is {w} and h is {h}")
     modified = face.resize((w, h), Image.BICUBIC)
     modified_np = np.asarray(modified)
     reverse_np = warp(modified_np, flow)
     reverse = Image.fromarray(reverse_np)
 
     # Saving the results
+    # flow = Image.fromarray(flow)
+    # flow.save(
+    #     os.path.join(dest_folder, 'flow.jpg'),
+    #     quality=90)
+    face.save(
+        os.path.join(dest_folder, 'face.jpg'),
+        quality=90)
     modified.save(
         os.path.join(dest_folder, 'cropped_input.jpg'),
         quality=90)

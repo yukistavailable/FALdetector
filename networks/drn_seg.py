@@ -18,7 +18,7 @@ def fill_up_weights(up):
 
 class DRNSeg(nn.Module):
     def __init__(self, classes, pretrained_drn=False,
-            pretrained_model=None, use_torch_up=False):
+                 pretrained_model=None, use_torch_up=False):
         super(DRNSeg, self).__init__()
 
         model = drn_c_26(pretrained=pretrained_drn)
@@ -63,7 +63,8 @@ class DRNSeg(nn.Module):
 
         # filter out unnecessary keys
         pretrained_dict = state_dict['model']
-        pretrained_dict = {k[5:]: v for k, v in pretrained_dict.items() if k.split('.')[0] == 'base'}
+        pretrained_dict = {k[5:]: v for k, v in pretrained_dict.items() if k.split('.')[
+            0] == 'base'}
 
         # load the pretrained state dict
         self.base.load_state_dict(pretrained_dict)
@@ -75,7 +76,9 @@ class DRNSub(nn.Module):
 
         drnseg = DRNSeg(2)
         if pretrained_model:
-            print("loading the pretrained drn model from %s" % pretrained_model)
+            print(
+                "loading the pretrained drn model from %s" %
+                pretrained_model)
             state_dict = torch.load(pretrained_model, map_location='cpu')
             drnseg.load_state_dict(state_dict['model'])
 

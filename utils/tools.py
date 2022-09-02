@@ -8,10 +8,10 @@ from dlib import cnn_face_detection_model_v1 as face_detect_model
 
 def center_crop(im, length):
     w, h = im.size
-    left = w//2 - length//2
-    right = w//2 + length//2
-    top = h//2 - length//2
-    bottom = h//2 + length//2
+    left = w // 2 - length // 2
+    right = w // 2 + length // 2
+    top = h // 2 - length // 2
+    bottom = h // 2 + length // 2
     return im.crop((left, top, right, bottom)), (left, top)
 
 
@@ -20,10 +20,10 @@ def remove_boundary(img):
     Remove boundary artifacts that FAL causes.
     """
     w, h = img.size
-    left = w//80
-    top = h//50
-    right = w*79//80
-    bottom = h*24//25
+    left = w // 80
+    top = h // 50
+    right = w * 79 // 80
+    bottom = h * 24 // 25
     return img.crop((left, top, right, bottom))
 
 
@@ -50,11 +50,11 @@ def resize_shorter_side(img, min_length):
 def flow_resize(flow, sz):
     oh, ow, _ = flow.shape
     w, h = sz
-    u_ = cv2.resize(flow[:,:,0], (w, h))
-    v_ = cv2.resize(flow[:,:,1], (w, h))
+    u_ = cv2.resize(flow[:, :, 0], (w, h))
+    v_ = cv2.resize(flow[:, :, 1], (w, h))
     u_ *= w / float(ow)
     v_ *= h / float(oh)
-    return np.dstack((u_,v_))
+    return np.dstack((u_, v_))
 
 
 def warp(im, flow, alpha=1, interp=cv2.INTER_CUBIC):
@@ -71,6 +71,8 @@ def warp(im, flow, alpha=1, interp=cv2.INTER_CUBIC):
 
 
 cnn_face_detector = None
+
+
 def face_detection(
         img_path,
         verbose=False,

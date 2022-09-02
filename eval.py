@@ -43,6 +43,8 @@ def load_local_detector(model_path, gpu_id):
 tf = transforms.Compose([transforms.ToTensor(),
                          transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                               std=[0.229, 0.224, 0.225])])
+
+
 def load_data(img_path, device):
     face = Image.open(img_path).convert('RGB')
     face = resize_shorter_side(face, 400)[0]
@@ -73,7 +75,10 @@ def detect_warp(model, img_path):
     flow = flow_resize(flow, modified.size)
     modified_np = np.asarray(modified)
     reverse_np = warp(modified_np, flow)
-    original = Image.open(img_path.replace('modified', 'reference')).convert('RGB')
+    original = Image.open(
+        img_path.replace(
+            'modified',
+            'reference')).convert('RGB')
     original_np = np.asarray(original.resize(modified.size, Image.BICUBIC))
 
     psnr_before = calc_psnr(original_np / 255, modified_np / 255)
@@ -97,19 +102,22 @@ if __name__ == '__main__':
     lcl_model = load_local_detector(args.local_pth, args.gpu_id)
 
     pred_prob, gt_prob, psnr_before, psnr_after = [], [], [], []
+    print(args.dataroot)
     for img_path in glob.glob(args.dataroot + '/original/*'):
+        print(img_path)
         pred_prob.append(classify_fake(glb_model, img_path))
         gt_prob.append(0)
 
     for img_path in glob.glob(args.dataroot + '/modified/*'):
+        print(img_path)
         pred_prob.append(classify_fake(glb_model, img_path))
         gt_prob.append(1)
         psnrs = detect_warp(lcl_model, img_path)
         psnr_before.append(psnrs[0])
         psnr_after.append(psnrs[1])
 
-    pred_prob, gt_prob, psnr_before, psnr_after = \
-        np.array(pred_prob), np.array(gt_prob), np.array(psnr_before), np.array(psnr_after)
+    pred_prob, gt_prob, psnr_before, psnr_after = np.array(pred_prob), np.array(
+        gt_prob), np.array(psnr_before), np.array(psnr_after)
     acc = accuracy_score(gt_prob, pred_prob > 0.5)
     avg_precision = average_precision_score(gt_prob, pred_prob)
     delta_psnr = psnr_after.mean() - psnr_before.mean()
